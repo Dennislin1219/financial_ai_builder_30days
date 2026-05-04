@@ -5,7 +5,39 @@
 	- `.gitinore` 告诉 GitHub 哪些文件不要上传（包括API key、缓存文件、临时文件）
 	- `readme.md` 这是什么、怎么跑起来、你做了什么决策。
 	- `requirements.txt` 记录你的 Python 项目需要安装哪些包。
+1. requirements.txt
+把项目推到 GitHub，别人拿到代码，不知道这个项目应该装什么包、装的哪个版本。有了 `requirements.txt`，跑一句 `pip install -r requirements.txt`，环境就和项目一样。
+```
+pip freeze                        # 把当前环境里所有已安装的包和它们的精确版本号，打印出来
+pip freeze > requirements.txt     # 写入文件，>是Shell的重定向符号，把输出写进文件
 
+pip install -r requirements.txt   # 把requirements里的包全部装好
+```
+2. 虚拟环境venv
+每个不同的项目需要不同的包，每次开始一个新的项目时（不管是clone还是自建），需要激活一个虚拟环境，在该特定项目的虚拟环境里装requirements.txt里所要求的包以及其他该项目所依赖的python环境，这些包就不会装在全局目录里，而是装在该特定项目里。注意venv不需要push到github上（因为经常这个文件夹会很大），要在.gitinore里写清楚。==每个新项目都建虚拟环境，这是好习惯，从一开始就养成。==
+```
+python -m venv venv #创建虚拟环境，-m venv 是"用Python内置的venv模块"，后面那个 `venv` 是你给这个文件夹起的名字，叫什么都行，但约定俗成都叫 `venv`。
+
+source venv/Scripts/activate #激活虚拟环境，激活后命令行里会出现(venv) $，说明处于虚拟环境。这个时候在pip装包，就装在属于该项目的特定虚拟环境里。
+
+deactivate #退出虚拟环境
+```
+- 只要你要运行这个项目的任何东西，都要先激活venv。==因此每次打开 VS Code 终端，第一件事就激活`source venv/Scripts/activate`
+```
+装包         pip install ...        → 要激活
+运行代码     python main.py         → 要激活(不激活就不能跑虚拟环境里装的包)
+跑测试       pytest                 → 要激活
+任何 pip 操作                       → 要激活
+```
+3. .gitinore
+```
+.gitinore一般有以下项目
+.env                     # API key，绝对不能上传，格式遵循ANTHROPIC_API_KEY=
+venv/                    # 虚拟环境文件夹，几百MB，没必要上传
+__pycache__/             # Python运行时自动生成的缓存文件夹
+*.pyc                    # `*` 是通配符，意思是"所有以 .pyc 结尾的文件"，这是Python编译后的缓存文件，一般情况下都在pycache文件夹，但在特殊情况下可能在文件夹外面，因此需要再单独列出
+.DS_Store                # Mac 系统自动生成的隐藏文件，Windows 用户没有，但加上没坏处
+```
 ## python数据类型
 
 1. **字符串str**
